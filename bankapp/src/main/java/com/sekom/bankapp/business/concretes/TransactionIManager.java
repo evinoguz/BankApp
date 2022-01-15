@@ -103,8 +103,8 @@ public class TransactionIManager implements TransactionService{
 
 	@Override
 	public Result transactionHistory(String customerNumber) {
-		Sort sort=Sort.by(Sort.Direction.DESC,"transactionId");
-		this.transactionDao.findAll(sort);
+		//Sort sort=Sort.by(Sort.Direction.DESC,"transactionId");
+		//this.transactionDao.findAll(sort);
 		return new SuccessDataResult<List<Transaction>>
 		(this.transactionDao.getByCustomerNumber(customerNumber),"Data listed");
 	}
