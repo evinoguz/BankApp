@@ -36,14 +36,14 @@ public class TransactionsController {
 		super();
 		this.transactionService = transactionService;
 	}
-	@PostMapping(value="/add")
+	/*@PostMapping(value="/add")
 	public ResponseEntity<?> add(@NotBlank @NotNull 
 			@RequestBody AccountUser account,
 			@RequestParam("amount") double amount,
 			@RequestParam("message") String message) {
 		return ResponseEntity.ok(this.transactionService.add(account,amount,message));
 	}
-	
+	*/
 	@GetMapping("/balanceInquir")
 	public ResponseEntity<?> balanceInquiry(@NotBlank @NotNull @RequestParam String customerNumber) {
 		return ResponseEntity.ok(this.transactionService.balanceInquiry(customerNumber));

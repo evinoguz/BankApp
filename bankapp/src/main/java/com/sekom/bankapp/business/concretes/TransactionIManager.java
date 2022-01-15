@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.sekom.bankapp.business.abstracts.TransactionService;
-import com.sekom.bankapp.core.utilities.DataResult;
 import com.sekom.bankapp.core.utilities.ErrorResult;
 import com.sekom.bankapp.core.utilities.Result;
 import com.sekom.bankapp.core.utilities.SuccessDataResult;
@@ -29,15 +28,15 @@ public class TransactionIManager implements TransactionService{
 		this.accountDao = accountDao;
 	}
 	
-	@Override
-	public Result add(AccountUser account, double amount,String message) {
+	//@Override
+	public boolean add(AccountUser account, double amount,String message) {
 		
 		Transaction transaction=new Transaction();
 		transaction.setAccount(account);
 		transaction.setCreatedDate(LocalDateTime.now());
 		transaction.setMessage(message);
 		this.transactionDao.save(transaction);
-		return new SuccessResult("Bank account created");
+		return true;
 	}
 
 	@Override
@@ -68,8 +67,12 @@ public class TransactionIManager implements TransactionService{
 		double lastBalance=balance+amount;
 		
 		this.accountDao.updateBalanceCustomerId(lastBalance, customerId);
-		//this.add(account, amount, "'"+customerNumber+"' $"+amount+" deposited");
-		return new SuccessResult("$"+amount+" deposited. Total balance: "+lastBalance);
+		boolean action=this.add(this.accountDao.getByCustomerNumber(customerNumber).get(0), amount, "'"+customerNumber+"' $"+amount+" deposited");
+		if(action) {
+			return new SuccessResult("$"+amount+" deposited. Total balance: "+lastBalance);
+		}
+		return new ErrorResult("Deposit transaction failed");
+
 	}
 
 	@Override
@@ -91,13 +94,17 @@ public class TransactionIManager implements TransactionService{
 		double lastBalance=balance-amount;
 		
 		this.accountDao.updateBalanceCustomerId(lastBalance, customerId);
-		//this.add(account, amount, "'"+customerNumber+"' $"+amount+" deposited");
-		return new SuccessResult("$"+amount+" withdrawn. Total balance: "+lastBalance);
+		boolean action=this.add(this.accountDao.getByCustomerNumber(customerNumber).get(0), amount, "'"+customerNumber+"' $"+amount+" deposited");
+		if(action) {
+			return new SuccessResult("$"+amount+" withdrawn. Total balance: "+lastBalance);
+		}
+		return new ErrorResult("Withdrawn transaction failed");
 	}
 
 	@Override
 	public Result transactionHistory(String customerNumber) {
-		//Sort sort=Sort.by(Sort.Direction.DESC,"transactionId");
+		Sort sort=Sort.by(Sort.Direction.DESC,"transactionId");
+		this.transactionDao.findAll(sort);
 		return new SuccessDataResult<List<Transaction>>
 		(this.transactionDao.getByCustomerNumber(customerNumber),"Data listed");
 	}
